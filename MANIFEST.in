@@ -1,0 +1,9 @@
+include LICENSE.txt README.rst
+recursive-include tests *
+recursive-include docs *
+recursive-include examples *.py
+recursive-include examples/templates *.html
+
+recursive-exclude * *.swp
+recursive-exclude * *.pyc
+recursive-exclude examples/static *

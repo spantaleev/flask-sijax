@@ -1,0 +1,61 @@
+<html>
+<head>
+    <script type="text/javascript"
+        src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax_upload.js"></script>
+    <script type="text/javascript">
+        {{ sijax_js }}
+        {{ form_init_js }}
+    </script>
+</head>
+
+<body>
+    <div style="float: left; width: 450px">
+        <form id="formOne" name="formOne" style="width: 400px" method="post" enctype="multipart/form-data">
+            Text field:
+            <input type="text" name="message" value="Some text" /><br />
+            
+            Drop-down:
+            <select name="dropdown">
+                <option>1</option>
+                <option selected="selected">2</option>
+                <option>3</option>
+            </select>
+            <br />
+            
+            Chechbox:
+            <input type="checkbox" checked="checked" name="chkbox" /><br />
+            
+            File:
+            <input type="file" name="file" /><br />
+            
+            <input type="submit" value="Upload" />
+        </form>
+
+        <div id="formOneResponse"></div>
+    </div>
+    
+    <div style="float: left; width: 450px">
+        <form id="formTwo" name="formTwo" style="width: 400px" method="post" enctype="multipart/form-data">
+            Text field:
+            <input type="text" name="message" value="Some text" /><br />
+            
+            Chechbox:
+            <input type="checkbox" checked="checked" name="chkbox" /><br />
+            
+            Chechbox 2:
+            <input type="checkbox" name="chkbox2" /><br />
+            
+            File:
+            <input type="file" name="file" /><br />
+            
+            <input type="submit" value="Upload" />
+        </form>
+
+        <div id="formTwoResponse"></div>
+    </div>
+</body>
+</html>
+
+

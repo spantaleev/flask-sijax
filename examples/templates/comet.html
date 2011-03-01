@@ -1,0 +1,32 @@
+<html>
+<head>
+    <script type="text/javascript"
+        src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript" src="/static/js/sijax/sijax_comet.js"></script>
+    <script type="text/javascript">
+        {{ sijax_js }}
+    </script>
+</head>
+
+<body>
+    <div id="progressWrapper" style="height: 22px; width: 400px; border: 1px solid #e0e0e0; margin-bottom: 10px;">
+        <div id="progress" style="width: 0px; height: 100%; background-color: #72cd52; display: block;">
+            &nbsp;
+        </div>
+    </div>
+    
+    
+    <button id="btnStart">Start</button>
+    
+    <script type="text/javascript">
+    $('#btnStart').bind('click', function () {
+        $('#progress').css('width', 0).html('&nbsp;');
+
+        //sleep time is 500ms
+        sjxComet.request('do_work', [0.5]);
+    });
+    </script>
+</body>
+</html>
+
