@@ -6,9 +6,6 @@ from flask import g, request, Response
 
 import sijax
 
-__version__ = '0.1.0'
-
-
 class SijaxHelper(object):
 
     def __init__(self, app):

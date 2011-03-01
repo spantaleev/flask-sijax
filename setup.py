@@ -8,11 +8,9 @@ to simplify Sijax (`PyPi <http://pypi.python.org/pypi/Sijax>`_, `GitHub <https:/
 
 from setuptools import setup
 
-from flaskext.sijax import __version__
-
 setup(
     name = "Flask-Sijax",
-    version = __version__,
+    version = '0.1.2',
     description = "An extension for the Flask microframework that adds Sijax support.",
     long_description = __doc__,
     author = "Slavi Pantaleev",
