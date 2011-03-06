@@ -7,3 +7,4 @@ dist
 *.egg
 *.swp
 examples/static
+docs/_build

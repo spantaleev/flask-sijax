@@ -7,6 +7,18 @@ from flask import g, request, Response
 import sijax
 
 class SijaxHelper(object):
+    """Helper class that you'll use to interact with Sijax.
+
+    An instance of this class is returned to you from
+    :func:`flaskext.sijax.init_sijax`. The instance is also bound
+    to ``flask.g.sijax`` at any time during a request.
+
+    This class tries to look like :class:`sijax.Sijax.Sijax`,
+    although the API differs slightly in order to make things easier for you.
+
+    You don't have to create an instance of this class yourself - 
+    you should let :func:`flaskext.sijax.init_sijax` do that for you.
+    """
 
     def __init__(self, app):
         self._app = app
@@ -27,11 +39,13 @@ class SijaxHelper(object):
         app.extensions['sijax'] = self
 
     def set_request_uri(self, uri):
-        """Changes the request URI from the automatically selected one.
+        """Changes the request URI from the automatically detected one.
 
-        The automatically selected URI is the URI of the current request.
-        You can override that with another URI (for this request only),
-        by using this function.
+        The automatically detected URI is the URI of the current request,
+        as detected by Flask/Werkzeug.
+
+        You can override the detected URI with another one
+        (for the current request only), by using this function.
         """
         self._sijax.set_request_uri(uri)
 
@@ -50,43 +64,63 @@ class SijaxHelper(object):
         """Registers a single callback function.
 
         Refer to :meth:`sijax.Sijax.Sijax.register_callback`
-        for more details.
+        for more details - this is a direct proxy to it.
         """
         self._sijax.register_callback(*args, **kwargs)
 
     def register_object(self, *args, **kwargs):
-        """Registers all functions from the object.
+        """Registers all "public" callable attributes of the given object.
+
+        The object could be anything (module, class, class instance, etc.)
 
         This makes mass registration of functions a lot easier.
 
         Refer to :meth:`sijax.Sijax.Sijax.register_object`
-        for more details.
+        for more details - this is a direct proxy to it.
         """
         self._sijax.register_object(*args, **kwargs)
 
     def register_comet_callback(self, *args, **kwargs):
-        """Registers a single Comet callback function.
+        """Registers a single Comet callback function
+        (see :ref:`comet-plugin`).
 
-        Refer to :meth:`sijax.plugin.comet.register_comet_callback`
-        for more details.
+        Refer to :func:`sijax.plugin.comet.register_comet_callback`
+        for more details - its signature differs slightly.
+
+        This method's signature is the same, except that the first
+        argument that :func:`sijax.plugin.comet.register_comet_callback`
+        expects is the sijax instance, and this method provides this automatically.
         """
         sijax.plugin.comet.register_comet_callback(self._sijax, *args, **kwargs)
 
     def register_comet_object(self, *args, **kwargs):
-        """Registers all functions from the object as Comet functions.
+        """Registers all functions from the object as Comet functions
+        (see :ref:`comet-plugin`).
 
         This makes mass registration of functions a lot easier.
 
-        Refer to :meth:`sijax.plugin.comet.register_comet_object`
-        for more details.
+        Refer to :func:`sijax.plugin.comet.register_comet_object`
+        for more details -ts signature differs slightly.
+
+        This method's signature is the same, except that the first
+        argument that :func:`sijax.plugin.comet.register_comet_object`
+        expects is the sijax instance, and this method provides this automatically.
         """
         sijax.plugin.comet.register_comet_object(self._sijax, *args, **kwargs)
 
     def register_upload_callback(self, *args, **kwargs):
-        """Registers an Upload function to handle a certain form.
+        """Registers an Upload function (see :ref:`upload-plugin`)
+        to handle a certain form.
 
-        Refer to :meth:`sijax.plugin.upload.register_upload_callback`
+        Refer to :func:`sijax.plugin.upload.register_upload_callback`
         for more details.
+
+        This method does passes some additional arguments to your handler
+        functions - the ``flask.request.files`` object.
+
+        Your upload handler function's signature should look like this::
+
+            def func(obj_response, files, form_values)
 
         :return: string - javascript code that initializes the form
         """
@@ -98,7 +132,7 @@ class SijaxHelper(object):
         """Registers a new event handler.
 
         Refer to :meth:`sijax.Sijax.Sijax.register_event`
-        for more details.
+        for more details - this is a direct proxy to it.
         """
         self._sijax.register_event(*args, **kwargs)
 
@@ -106,7 +140,8 @@ class SijaxHelper(object):
     def is_sijax_request(self):
         """Tells whether the current request is meant to be handled by Sijax.
 
-        Refer to :meth:`sijax.Sijax.Sijax.is_sijax_request` for more details.
+        Refer to :meth:`sijax.Sijax.Sijax.is_sijax_request` for more details -
+        this is a direct proxy to it.
         """
         return self._sijax.is_sijax_request()
 
@@ -115,8 +150,6 @@ class SijaxHelper(object):
 
         Refer to :meth:`sijax.Sijax.Sijax.process_request` for more details.
         """
-
-
         response = self._sijax.process_request()
         return _make_response(response)
 
@@ -151,15 +184,32 @@ def _make_response(response):
     
 
 def init_sijax(app):
+    """Initializes the Flask-Sijax extension for the given application.
+
+    :param app: the Flask application object
+    :return: a reference to the helper object - 
+             an instance of :class:`flaskext.sijax.SijaxHelper`
+    """
     return SijaxHelper(app)
 
 
 def route(app_or_module_obj, rule, **options): 
-    """A wrapper to app.route() or mod.route() that always adds the POST method
+    """An alternative to ``@app.route()`` or ``@mod.route()`` that always adds the POST method
     to the allowed methods for a handler.
+
+    You should use this for all your view functions that would need to use Sijax.
 
     We're doing this because Sijax uses POST for data passing, which means that
     every endpoint that wants Sijax support would have to accept POST requests.
+
+    If you remember to register your view functions with ``methods=['POST']``
+    like this::
+
+        @app.route('/', methods=['POST'])
+        def index():
+            pass
+
+    you can avoid using this decorator.
     """
     def decorator(f):
         methods = options.pop('methods', ('GET', 'POST'))
