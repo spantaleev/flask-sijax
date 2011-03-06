@@ -6,6 +6,14 @@ Flask-Sijax is an extension for the `Flask <http://flask.pocoo.org>`_ microframe
 to simplify Sijax (`PyPi <http://pypi.python.org/pypi/Sijax>`_, `GitHub <https://github.com/spantaleev/sijax-python>`_) setup and usage for Flask users.
 
 Sijax is a Python/jQuery library that makes AJAX easy to use in web applications.
+
+Links                                                                                                                                                                              
+-----
+
+* `source <https://github.com/spantaleev/flask-sijax>`_
+* `documentation <http://packages.python.org/Flask-Sijax>`_
+* `Sijax source <https://github.com/spantaleev/sijax-python>`_
+* `Sijax documentation <http://packages.python.org/Sijax/>`_
 """
 
 from setuptools import setup
@@ -23,7 +31,7 @@ setup(
     license = "BSD",
     packages = ['flaskext'],
     namespace_packages=['flaskext'],
-    install_requires = ['Flask', 'Sijax>=0.1.5'],
+    install_requires = ['Flask', 'Sijax>=0.1.6'],
     test_suite = 'tests',
     zip_safe = False,
     classifiers = [
