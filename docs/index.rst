@@ -205,7 +205,7 @@ The `documentation for Sijax <http://packages.python.org/Sijax/>`_ is very exhau
 * :ref:`Upload Plugin <sijax:upload-plugin>`
 * :ref:`Sijax.request() <sijax:clientside-sijax-request>`
 * :ref:`Sijax.getFormValues() <sijax:clientside-sijax-get-form-values>`
-* :ref:`FAQ <sijax:clientside-faq>`
+* :ref:`FAQ <sijax:faq>`
 
 
 API
