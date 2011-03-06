@@ -12,6 +12,8 @@ Links
 
 * `source <https://github.com/spantaleev/flask-sijax>`_
 * `documentation <http://packages.python.org/Flask-Sijax>`_
+* `development version
+  <https://github.com/spantaleev/flask-sijax/zipball/master#egg=Flask-Sijax-dev>`_
 * `Sijax source <https://github.com/spantaleev/sijax-python>`_
 * `Sijax documentation <http://packages.python.org/Sijax/>`_
 """

@@ -7,3 +7,5 @@ recursive-exclude * *.swp
 recursive-exclude * *.pyc
 recursive-exclude examples/static *
 recursive-exclude docs/_build *
+recursive-exclude docs/_themes/.git *
+exclude docs/_themes/.gitignore
