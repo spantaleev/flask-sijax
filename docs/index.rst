@@ -73,9 +73,9 @@ Making your Flask (view) functions Sijax-aware
 ----------------------------------------------
 
 To make a function support Sijax requests, you need to create the route to it in a special way.
-If you're not new to Flask you're aware of the `@app.route` or `@mod.route` decorators that register your function with Flask.
+If you're not new to Flask you're aware of the ``@app.route`` or ``@mod.route`` decorators that register your function with Flask.
 
-You need to use `@flaskext.sijax.route` instead of `@app.route` or `@mod.route` if you intend to use Sijax
+You need to use ``@flaskext.sijax.route`` instead of ``@app.route`` or ``@mod.route`` if you intend to use Sijax
 within a given Flask endpoint function.
 Here's how you do it::
 
