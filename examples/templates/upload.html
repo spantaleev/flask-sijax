@@ -5,8 +5,8 @@
     <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
     <script type="text/javascript" src="/static/js/sijax/sijax_upload.js"></script>
     <script type="text/javascript">
-        {{ sijax_js }}
-        {{ form_init_js }}
+        {{ g.sijax.get_js()|safe }}
+        {{ form_init_js|safe }}
     </script>
 </head>
 

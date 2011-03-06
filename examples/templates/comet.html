@@ -5,7 +5,7 @@
     <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
     <script type="text/javascript" src="/static/js/sijax/sijax_comet.js"></script>
     <script type="text/javascript">
-        {{ sijax_js }}
+        {{ g.sijax.get_js()|safe }}
     </script>
 </head>
 

@@ -7,7 +7,7 @@ import os, sys
 path = os.path.join('.', os.path.dirname(__file__), '../')
 sys.path.append(path)
 
-from flask import Flask, g, render_template, Markup
+from flask import Flask, g, render_template
 from flaskext.sijax import init_sijax, route
 
 app = Flask(__name__)
@@ -83,9 +83,7 @@ def index():
         g.sijax.register_object(SijaxHandler)
         return g.sijax.process_request()
 
-    sijax_js = Markup(g.sijax.get_js())
-
-    return render_template('chat.html', sijax_js=sijax_js)
+    return render_template('chat.html')
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080) 
