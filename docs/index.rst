@@ -3,8 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Flask-Sijax's documentation!
-=======================================
+Flask-Sijax
+===========
 
 :Author: Slavi Pantaleev<s.pantaleev_REMOVE@ME_gmail.com>
 :Version: |release|
@@ -43,9 +43,11 @@ Here's an example of how Flask-Sijax is typically initialized and configured::
     from flask import Flask
     from flaskext.sijax import init_sijax, route
 
+    path = os.path.join('.', os.path.dirname(__file__), 'static/js/sijax/')
+
     app = Flask(__name__)
-    app.config["SIJAX_STATIC_PATH"] = os.path.join('.', os.path.dirname(__file__), 'static/js/sijax/')
-    app.config["SIJAX_JSON_URI"] = '/static/js/sijax/json2.js'
+    app.config['SIJAX_STATIC_PATH'] = path
+    app.config['SIJAX_JSON_URI'] = '/static/js/sijax/json2.js'
     init_sijax(app)
 
 
@@ -61,15 +63,15 @@ Flask-Sijax takes care of keeping the Sijax files up to date in this directory (
 The specified directory needs to be dedicated for Sijax static files. You should not put anything else in it.
 
 
-* **SIJAX_JSON_URI** - the URI to load the `json2.js` static file from (in case it's needed).
+* **SIJAX_JSON_URI** - the URI to load the ``json2.js`` static file from (in case it's needed).
 
 Sijax uses JSON to pass data between the browser and server. This means that browsers either need to support
-JSON natively, or get JSON support from the `json2.js` file. Such browsers include IE <= 7.
-If you've set a URI to `json2.js` and Sijax detects that the browser needs to load it, it will do so on demand.
+JSON natively, or get JSON support from the ``json2.js`` file. Such browsers include IE <= 7.
+If you've set a URI to ``json2.js`` and Sijax detects that the browser needs to load it, it will do so on demand.
 The URI could be relative or absolute.
 
 
-Making your Flask (view) functions Sijax-aware
+Making your Flask functions Sijax-aware
 ----------------------------------------------
 
 To make a function support Sijax requests, you need to create the route to it in a special way.
@@ -77,6 +79,7 @@ If you're not new to Flask you're aware of the ``@app.route`` or ``@mod.route`` 
 
 You need to use ``@flaskext.sijax.route`` instead of ``@app.route`` or ``@mod.route`` if you intend to use Sijax
 within a given Flask endpoint function.
+
 Here's how you do it::
 
     # Initialization code for Flask and Flask-Sijax
@@ -92,10 +95,11 @@ Here's how you do it::
     # because it uses the special @flaskext.sijax.route decorator
     @flaskext.sijax.route(app, '/hello')
     def hello():
-        # Every Sijax handler function (like this one) receives at least one parameter
-        # automatically, much like Python passes `self` to object methods.
-        # The `obj_response` parameter is the function's way of talking back
-        # to the browser
+        # Every Sijax handler function (like this one) receives at least
+        # one parameter automatically, much like Python passes `self`
+        # to object methods.
+        # The `obj_response` parameter is the function's way of talking
+        # back to the browser
         def say_hi(obj_response):
             obj_response.alert('Hi there!')
 
@@ -111,11 +115,13 @@ Let's assume ``_render_template()`` renders the following page::
 
     <html>
     <head>
-        <script type="text/javascript" src="{ URI to jQuery - not included with this project}"></script>
-        <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
-        <script type="text/javascript">
-            {{ g.sijax.get_js()|safe }}
-        </script>
+    <script type="text/javascript"
+        src="{ URI to jQuery - not included with this project}"></script>
+    <script type="text/javascript"
+        src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript">
+        {{ g.sijax.get_js()|safe }}
+    </script>
     </head>
     <body>
         <a href="javascript://" onclick="Sijax.request('say_hi');"></a>
@@ -144,19 +150,21 @@ That code is page-specific and needs to be executed, after the ``sijax.js`` file
 
 Assuming you've used the above configuration here's what HTML markup you need to add to your template::
 
-    <script type="text/javascript" src="{ URI to jQuery - not included with this project}"></script>
-    <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
+    <script type="text/javascript"
+        src="{ URI to jQuery - not included with this project}"></script>
+    <script type="text/javascript"
+        src="/static/js/sijax/sijax.js"></script>
     <script type="text/javascript">
         {{ g.sijax.get_js()|safe }}
     </script>
 
-You can then invoke a Sijax function like this::
+You can then invoke a Sijax function using javascript like this::
 
-    Sijax.request('function_name', ['argument 1', 150, 'argument 3', 'argument 4']);
+    Sijax.request('function_name', ['argument 1', 150, 'argument 3']);
 
 provided it has been defined and registered with Sijax::
 
-    def function_name(obj_response, arg1, arg2, arg3, arg4):
+    def function_name(obj_response, arg1, arg2, arg3):
         obj_response.alert('You called the function successfully!')
 
     g.sijax.register_callback('function_name', function_name)
