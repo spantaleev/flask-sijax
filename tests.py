@@ -86,12 +86,12 @@ class SijaxFlaskTestCase(unittest.TestCase):
             app.preprocess_request()
         
             js = helper.get_js()
-            self.assertTrue('Sijax.setRequestUri("http://localhost/");' in js)
+            self.assertTrue('Sijax.setRequestUri("/");' in js)
 
             helper.set_request_uri('http://something.else/')
 
             js = helper.get_js()
-            self.assertFalse('Sijax.setRequestUri("http://localhost/");' in js)
+            self.assertFalse('Sijax.setRequestUri("/");' in js)
             self.assertTrue('Sijax.setRequestUri("http://something.else/");' in js)
 
         # Ensure that the changed request uri was valid for the previous request only
@@ -99,8 +99,15 @@ class SijaxFlaskTestCase(unittest.TestCase):
             app.preprocess_request()
 
             js = helper.get_js()
-            self.assertTrue('Sijax.setRequestUri("http://localhost/");' in js)
+            self.assertTrue('Sijax.setRequestUri("/");' in js)
             self.assertFalse('Sijax.setRequestUri("http://something.else/");' in js)
+
+        # Ensure that the changed request uri was valid for the previous request only
+        with app.test_request_context('/relative/url?query=string&is=here'):
+            app.preprocess_request()
+
+            js = helper.get_js()
+            self.assertTrue('Sijax.setRequestUri("/relative/url?query=string&is=here");' in js)
 
     def test_registering_callbacks_in_a_non_request_context_fails(self):
         app = flask.Flask(__name__)

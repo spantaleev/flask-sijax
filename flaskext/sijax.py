@@ -41,8 +41,8 @@ class SijaxHelper(object):
     def set_request_uri(self, uri):
         """Changes the request URI from the automatically detected one.
 
-        The automatically detected URI is the URI of the current request,
-        as detected by Flask/Werkzeug.
+        The automatically detected URI is the relative URI of the
+        current request, as detected by Flask/Werkzeug.
 
         You can override the detected URI with another one
         (for the current request only), by using this function.
@@ -53,9 +53,10 @@ class SijaxHelper(object):
         g.sijax = self
 
         self._sijax = sijax.Sijax.Sijax()
-
         self._sijax.set_data(request.form)
-        self._sijax.set_request_uri(request.url)
+
+        url_relative = request.url[len(request.host_url) -1:]
+        self._sijax.set_request_uri(url_relative)
 
         if self._json_uri is not None:
             self._sijax.set_json_uri(self._json_uri)
