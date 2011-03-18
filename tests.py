@@ -102,7 +102,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             self.assertTrue('Sijax.setRequestUri("/");' in js)
             self.assertFalse('Sijax.setRequestUri("http://something.else/");' in js)
 
-        # Ensure that the changed request uri was valid for the previous request only
+        # Test that a more complex request url (with query string, etc) works
         with app.test_request_context('/relative/url?query=string&is=here'):
             app.preprocess_request()
 
