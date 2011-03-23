@@ -13,7 +13,7 @@ class SijaxHelper(object):
     :func:`flaskext.sijax.init_sijax`. The instance is also bound
     to ``flask.g.sijax`` at any time during a request.
 
-    This class tries to look like :class:`sijax.core.Sijax`,
+    This class tries to look like :class:`sijax.Sijax`,
     although the API differs slightly in order to make things easier for you.
 
     You don't have to create an instance of this class yourself - 
