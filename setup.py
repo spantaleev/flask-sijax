@@ -22,7 +22,7 @@ from setuptools import setup
 
 setup(
     name = "Flask-Sijax",
-    version = '0.1.5',
+    version = '0.2.0',
     description = "An extension for the Flask microframework that adds Sijax support.",
     long_description = __doc__,
     author = "Slavi Pantaleev",
@@ -33,7 +33,7 @@ setup(
     license = "BSD",
     packages = ['flaskext'],
     namespace_packages=['flaskext'],
-    install_requires = ['Flask', 'Sijax>=0.1.6'],
+    install_requires = ['Flask', 'Sijax>=0.2.0'],
     test_suite = 'tests',
     zip_safe = False,
     classifiers = [

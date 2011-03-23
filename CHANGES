@@ -1,0 +1,13 @@
+Flask-Sijax Changelog
+=====================
+
+Version 0.2.0
+-------------
+
+Adds compatibility with Sijax 0.2.0, which introduced some API changes.
+The Flask-Sijax API however remains unchanged.
+
+Version 0.1.x
+-------------
+
+Initial release.

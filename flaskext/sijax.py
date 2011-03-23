@@ -13,7 +13,7 @@ class SijaxHelper(object):
     :func:`flaskext.sijax.init_sijax`. The instance is also bound
     to ``flask.g.sijax`` at any time during a request.
 
-    This class tries to look like :class:`sijax.Sijax.Sijax`,
+    This class tries to look like :class:`sijax.core.Sijax`,
     although the API differs slightly in order to make things easier for you.
 
     You don't have to create an instance of this class yourself - 
@@ -52,7 +52,7 @@ class SijaxHelper(object):
     def _on_before_request(self):
         g.sijax = self
 
-        self._sijax = sijax.Sijax.Sijax()
+        self._sijax = sijax.Sijax()
         self._sijax.set_data(request.form)
 
         url_relative = request.url[len(request.host_url) -1:]
@@ -64,7 +64,7 @@ class SijaxHelper(object):
     def register_callback(self, *args, **kwargs):
         """Registers a single callback function.
 
-        Refer to :meth:`sijax.Sijax.Sijax.register_callback`
+        Refer to :meth:`sijax.Sijax.register_callback`
         for more details - this is a direct proxy to it.
         """
         self._sijax.register_callback(*args, **kwargs)
@@ -90,7 +90,8 @@ class SijaxHelper(object):
 
         This method's signature is the same, except that the first
         argument that :func:`sijax.plugin.comet.register_comet_callback`
-        expects is the sijax instance, and this method provides this automatically.
+        expects is the Sijax instance, and this method
+        does that automatically, so you don't have to do it.
         """
         sijax.plugin.comet.register_comet_callback(self._sijax, *args, **kwargs)
 
@@ -105,7 +106,8 @@ class SijaxHelper(object):
 
         This method's signature is the same, except that the first
         argument that :func:`sijax.plugin.comet.register_comet_object`
-        expects is the sijax instance, and this method provides this automatically.
+        expects is the Sijax instance, and this method
+        does that automatically, so you don't have to do it.
         """
         sijax.plugin.comet.register_comet_object(self._sijax, *args, **kwargs)
 
@@ -116,7 +118,7 @@ class SijaxHelper(object):
         Refer to :func:`sijax.plugin.upload.register_upload_callback`
         for more details.
 
-        This method does passes some additional arguments to your handler
+        This method passes some additional arguments to your handler
         functions - the ``flask.request.files`` object.
 
         Your upload handler function's signature should look like this::
@@ -132,7 +134,7 @@ class SijaxHelper(object):
     def register_event(self, *args, **kwargs):
         """Registers a new event handler.
 
-        Refer to :meth:`sijax.Sijax.Sijax.register_event`
+        Refer to :meth:`sijax.Sijax.register_event`
         for more details - this is a direct proxy to it.
         """
         self._sijax.register_event(*args, **kwargs)
@@ -141,15 +143,15 @@ class SijaxHelper(object):
     def is_sijax_request(self):
         """Tells whether the current request is meant to be handled by Sijax.
 
-        Refer to :meth:`sijax.Sijax.Sijax.is_sijax_request` for more details -
+        Refer to :attr:`sijax.Sijax.is_sijax_request` for more details -
         this is a direct proxy to it.
         """
-        return self._sijax.is_sijax_request()
+        return self._sijax.is_sijax_request
 
     def process_request(self):
         """Processes the Sijax request and returns the proper response.
 
-        Refer to :meth:`sijax.Sijax.Sijax.process_request` for more details.
+        Refer to :meth:`sijax.Sijax.process_request` for more details.
         """
         response = self._sijax.process_request()
         return _make_response(response)
@@ -157,7 +159,7 @@ class SijaxHelper(object):
     def execute_callback(self, *args, **kwargs):
         """Executes a callback and returns the proper response.
 
-        Refer to :meth:`sijax.Sijax.Sijax.execute_callback` for more details.
+        Refer to :meth:`sijax.Sijax.execute_callback` for more details.
         """
         response = self._sijax.execute_callback(*args, **kwargs)
         return _make_response(response)
@@ -172,7 +174,8 @@ class SijaxHelper(object):
 
 
 def _make_response(response):
-    """Takes a Sijax response object and returns a valid Flask response object."""
+    """Takes a Sijax response object and returns a
+    valid Flask response object."""
 
     from types import GeneratorType
 
@@ -195,22 +198,21 @@ def init_sijax(app):
 
 
 def route(app_or_module_obj, rule, **options): 
-    """An alternative to ``@app.route()`` or ``@mod.route()`` that always adds the POST method
-    to the allowed methods for a handler.
+    """An alternative to ``@app.route()`` or ``@mod.route()`` that
+    always adds the ``POST`` method to the allowed methods for a handler.
 
     You should use this for all your view functions that would need to use Sijax.
 
-    We're doing this because Sijax uses POST for data passing, which means that
-    every endpoint that wants Sijax support would have to accept POST requests.
+    We're doing this because Sijax uses ``POST`` for data passing,
+    which means that every endpoint that wants Sijax support
+    would have to accept ``POST`` requests.
 
     If you remember to register your view functions with ``methods=['POST']``
-    like this::
+    like this, you can avoid using this decorator::
 
         @app.route('/', methods=['POST'])
         def index():
             pass
-
-    you can avoid using this decorator.
     """
     def decorator(f):
         methods = options.pop('methods', ('GET', 'POST'))

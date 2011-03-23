@@ -208,7 +208,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
     def test_process_request_returns_a_string_or_a_flask_response_object(self):
         # SijaxHelper.process_request should return a string for regular functions
         # and a Flask.Response object for functions that use a generator (streaming functions)
-        from sijax.response.StreamingIframeResponse import StreamingIframeResponse
+        from sijax.response import StreamingIframeResponse
 
         app = flask.Flask(__name__)
         helper = init_sijax(app)
