@@ -7,7 +7,7 @@ to simplify Sijax (`PyPi <http://pypi.python.org/pypi/Sijax>`_, `GitHub <https:/
 
 Sijax is a Python/jQuery library that makes AJAX easy to use in web applications.
 
-Links                                                                                                                                                                              
+Links
 -----
 
 * `source <https://github.com/spantaleev/flask-sijax>`_
@@ -22,7 +22,7 @@ from setuptools import setup
 
 setup(
     name = "Flask-Sijax",
-    version = '0.2.0',
+    version = '0.2.1',
     description = "An extension for the Flask microframework that adds Sijax support.",
     long_description = __doc__,
     author = "Slavi Pantaleev",
