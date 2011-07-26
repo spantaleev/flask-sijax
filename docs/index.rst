@@ -116,7 +116,7 @@ Let's assume ``_render_template()`` renders the following page::
     <html>
     <head>
     <script type="text/javascript"
-        src="{ URI to jQuery - not included with this project}"></script>
+        src="{ URI to jQuery - not included with this project }"></script>
     <script type="text/javascript"
         src="/static/js/sijax/sijax.js"></script>
     <script type="text/javascript">
@@ -136,7 +136,7 @@ All functions registered using ``g.sijax.register_callback()`` (see :meth:`flask
 
 Calling ``g.sijax.process_request()`` tells Sijax to call the appropriate function (previously registered) and return the response to the browser.
 
-To learn more on ``obj_response`` and what it provides, see :class:`sijax.response.BaseResponse.BaseResponse`.
+To learn more on ``obj_response`` and what it provides, see :class:`sijax.response.BaseResponse`.
     
 
 Setting up the client (browser)
