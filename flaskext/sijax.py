@@ -55,7 +55,7 @@ class SijaxHelper(object):
         self._sijax = sijax.Sijax()
         self._sijax.set_data(request.form)
 
-        url_relative = request.url[len(request.host_url) -1:]
+        url_relative = request.url[len(request.host_url) - 1:]
         self._sijax.set_request_uri(url_relative)
 
         if self._json_uri is not None:
@@ -76,7 +76,7 @@ class SijaxHelper(object):
 
         This makes mass registration of functions a lot easier.
 
-        Refer to :meth:`sijax.Sijax.Sijax.register_object`
+        Refer to :meth:`sijax.Sijax.register_object`
         for more details - this is a direct proxy to it.
         """
         self._sijax.register_object(*args, **kwargs)
