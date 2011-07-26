@@ -16,7 +16,7 @@ class SijaxHelper(object):
     This class tries to look like :class:`sijax.Sijax`,
     although the API differs slightly in order to make things easier for you.
 
-    You don't have to create an instance of this class yourself - 
+    You don't have to create an instance of this class yourself -
     you should let :func:`flaskext.sijax.init_sijax` do that for you.
     """
 
@@ -130,7 +130,7 @@ class SijaxHelper(object):
         if 'args_extra' not in kwargs:
             kwargs['args_extra'] = [request.files]
         return sijax.plugin.upload.register_upload_callback(self._sijax, *args, **kwargs)
-        
+
     def register_event(self, *args, **kwargs):
         """Registers a new event handler.
 
@@ -179,25 +179,25 @@ def _make_response(response):
 
     from types import GeneratorType
 
-    if isinstance(response, GeneratorType):                                              
+    if isinstance(response, GeneratorType):
         # Streaming response using a generator (non-JSON)
-        return Response(response, direct_passthrough=True)                               
-                                                                                         
-    # Non-streaming response - a single JSON string 
-    return response 
-    
+        return Response(response, direct_passthrough=True)
+
+    # Non-streaming response - a single JSON string
+    return response
+
 
 def init_sijax(app):
     """Initializes the Flask-Sijax extension for the given application.
 
     :param app: the Flask application object
-    :return: a reference to the helper object - 
+    :return: a reference to the helper object -
              an instance of :class:`flaskext.sijax.SijaxHelper`
     """
     return SijaxHelper(app)
 
 
-def route(app_or_module_obj, rule, **options): 
+def route(app_or_module_obj, rule, **options):
     """An alternative to ``@app.route()`` or ``@mod.route()`` that
     always adds the ``POST`` method to the allowed methods for a handler.
 
@@ -219,9 +219,9 @@ def route(app_or_module_obj, rule, **options):
         if 'POST' not in methods:
             methods = tuple(methods) + ('POST',)
         options['methods'] = methods
-        
+
         app_or_module_obj.add_url_rule(rule, None, f, **options)
         return f
-        
+
     return decorator
 
