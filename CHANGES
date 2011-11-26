@@ -1,6 +1,15 @@
 Flask-Sijax Changelog
 =====================
 
+Version 0.3.0
+-------------
+
+The extension now lives in the flask_sijax package,
+instead of the flaskext.sijax namespaced package.
+
+Minor backwards incompatible API changes that make Flask-Sijax
+more consistent with Flask extension patterns.
+
 Version 0.2.0
 -------------
 

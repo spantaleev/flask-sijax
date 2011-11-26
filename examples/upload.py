@@ -15,7 +15,7 @@ path = os.path.join('.', os.path.dirname(__file__), '../')
 sys.path.append(path)
 
 from flask import Flask, g, render_template
-from flaskext.sijax import init_sijax, route
+import flask_sijax
 
 app = Flask(__name__)
 
@@ -27,7 +27,7 @@ app.config["SIJAX_STATIC_PATH"] = os.path.join('.', os.path.dirname(__file__), '
 # browsers that don't support JSON natively (like IE <= 7)
 app.config["SIJAX_JSON_URI"] = '/static/js/sijax/json2.js'
 
-init_sijax(app)
+flask_sijax.Sijax(app)
 
 class SijaxHandler(object):
     """A container class for all Sijax handlers.
@@ -60,7 +60,7 @@ class SijaxHandler(object):
     @staticmethod
     def form_one_handler(obj_response, files, form_values):
         SijaxHandler._dump_data(obj_response, files, form_values, 'formOneResponse')
-        
+
     @staticmethod
     def form_two_handler(obj_response, files, form_values):
         SijaxHandler._dump_data(obj_response, files, form_values, 'formTwoResponse')
@@ -70,14 +70,14 @@ class SijaxHandler(object):
 
         # Send the data to the browser now
         yield obj_response
-        
+
         from time import sleep
         sleep(2)
-        
+
         obj_response.html_append('#formTwoResponse', '<br />Finished!')
 
 
-@route(app, "/")
+@flask_sijax.route(app, "/")
 def index():
     # Notice how we're doing callback registration on each request,
     # instead of only when needed (when the request is a Sijax request).
@@ -95,6 +95,4 @@ def index():
     return render_template('upload.html', form_init_js=form_init_js)
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080) 
-
-
+    app.run(debug=True, port=8080)

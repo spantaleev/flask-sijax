@@ -9,7 +9,7 @@ sys.path.append(path)
 
 
 from flask import Flask, g, render_template
-from flaskext.sijax import init_sijax, route
+import flask_sijax
 
 app = Flask(__name__)
 
@@ -21,16 +21,16 @@ app.config["SIJAX_STATIC_PATH"] = os.path.join('.', os.path.dirname(__file__), '
 # browsers that don't support JSON natively (like IE <= 7)
 app.config["SIJAX_JSON_URI"] = '/static/js/sijax/json2.js'
 
-init_sijax(app)
+flask_sijax.Sijax(app)
 
 # Regular flask view function - Sijax is unavailable here
 @app.route("/")
 def hello():
     return "Hello World!<br /><a href='/sijax'>Go to Sijax test</a>"
 
-# Sijax enabled function - notice the `@route` decorator
-# in place of `@app.route` (above) or `@mod.route` (when using Modules)
-@route(app, "/sijax")
+# Sijax enabled function - notice the `@Sijax.route` decorator
+# used instead of `@app.route` (above).
+@flask_sijax.route(app, "/sijax")
 def hello_sijax():
     # Sijax handler function receiving 2 arguments from the browser
     # The first argument (obj_response) is passed automatically
@@ -54,4 +54,4 @@ def hello_sijax():
     return render_template('hello.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080) 
+    app.run(debug=True, port=8080)

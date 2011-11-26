@@ -8,7 +8,7 @@ path = os.path.join('.', os.path.dirname(__file__), '../')
 sys.path.append(path)
 
 from flask import Flask, g, render_template
-from flaskext.sijax import init_sijax, route
+import flask_sijax
 
 app = Flask(__name__)
 
@@ -20,7 +20,7 @@ app.config["SIJAX_STATIC_PATH"] = os.path.join('.', os.path.dirname(__file__), '
 # browsers that don't support JSON natively (like IE <= 7)
 app.config["SIJAX_JSON_URI"] = '/static/js/sijax/json2.js'
 
-init_sijax(app)
+flask_sijax.Sijax(app)
 
 def comet_do_work_handler(obj_response, sleep_time):
     import time
@@ -39,7 +39,7 @@ def comet_do_work_handler(obj_response, sleep_time):
             time.sleep(sleep_time)
 
 
-@route(app, "/")
+@flask_sijax.route(app, "/")
 def index():
     if g.sijax.is_sijax_request:
         # The request looks like a valid Sijax request
@@ -50,6 +50,4 @@ def index():
     return render_template('comet.html')
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8080) 
-
-
+    app.run(debug=True, port=8080)

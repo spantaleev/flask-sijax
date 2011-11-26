@@ -4,7 +4,7 @@ from __future__ import with_statement
 import unittest
 
 import flask
-from flaskext.sijax import init_sijax, route, SijaxHelper
+import flask_sijax
 
 
 def _assert_response_json(context, string):
@@ -32,7 +32,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
         def try_route(methods_expected, **options):
             app = FlaskMock()
-            decorator = route(app, '/rule', **options)
+            decorator = flask_sijax.route(app, '/rule', **options)
             decorator(lambda a: a)
             self.assertEqual(tuple(methods_expected), app.methods)
 
@@ -43,13 +43,9 @@ class SijaxFlaskTestCase(unittest.TestCase):
         try_route(('GET', 'DELETE', 'POST'), methods=('GET', 'DELETE'))
 
     def test_sijax_helper_object_is_only_bound_to_g_in_a_request_context(self):
-        # Test that not only is the helper object returned
-        # by `init_sijax`, but that during a request,
-        # it's available from `flask.g.sijax`
-
         app = flask.Flask(__name__)
 
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             app.preprocess_request()
@@ -64,12 +60,22 @@ class SijaxFlaskTestCase(unittest.TestCase):
         else:
             self.fail('Bound to g in a non-request context!')
 
+    def test_delayed_app_initialization_works(self):
+        # Makes sure that an app object can be provided at a later point
+        # and that Sijax would still be registered correctly.
+        app = flask.Flask(__name__)
+        helper = flask_sijax.Sijax()
+        helper.init_app(app)
+        with app.test_request_context():
+            app.preprocess_request()
+            self.assertEqual(id(helper), id(flask.g.sijax))
+
     def test_json_uri_config_is_used(self):
         uri = '/some/json_uri.here'
 
         app = flask.Flask(__name__)
         app.config['SIJAX_JSON_URI'] = uri
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
         with app.test_request_context():
             app.preprocess_request()
 
@@ -83,7 +89,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
         app = flask.Flask(__name__)
 
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             app.preprocess_request()
@@ -114,7 +120,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
     def test_registering_callbacks_in_a_non_request_context_fails(self):
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         try:
             helper.register_callback('test', lambda r: r)
@@ -125,7 +131,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
     def test_registering_callbacks_in_a_request_context_with_no_preprocessing_fails(self):
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             try:
@@ -144,7 +150,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
 
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             app.preprocess_request()
@@ -170,7 +176,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
         from types import GeneratorType
 
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         call_history = []
 
@@ -197,24 +203,22 @@ class SijaxFlaskTestCase(unittest.TestCase):
             self.assertEqual(expected_history, call_history)
 
     def test_sijax_helper_passes_correct_post_data(self):
-        # It's expected that SijaxHelper passes `flask.request.form` as post data
-        # in the "on before request" stage
-
+        # It's expected that the Sijax Helper class passes `flask.request.form`
+        # as post data in the "on before request" stage
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             app.preprocess_request()
-
             self.assertEqual(id(helper._sijax.get_data()), id(flask.request.form))
 
     def test_process_request_returns_a_string_or_a_flask_response_object(self):
-        # SijaxHelper.process_request should return a string for regular functions
+        # flask_sijax.Sijax.process_request should return a string for regular functions
         # and a Flask.Response object for functions that use a generator (streaming functions)
         from sijax.response import StreamingIframeResponse
 
         app = flask.Flask(__name__)
-        helper = init_sijax(app)
+        helper = flask_sijax.Sijax(app)
 
         with app.test_request_context():
             app.preprocess_request()

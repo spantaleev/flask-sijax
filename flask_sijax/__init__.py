@@ -6,23 +6,26 @@ from flask import g, request, Response
 
 import sijax
 
-class SijaxHelper(object):
+class Sijax(object):
     """Helper class that you'll use to interact with Sijax.
-
-    An instance of this class is returned to you from
-    :func:`flaskext.sijax.init_sijax`. The instance is also bound
-    to ``flask.g.sijax`` at any time during a request.
 
     This class tries to look like :class:`sijax.Sijax`,
     although the API differs slightly in order to make things easier for you.
-
-    You don't have to create an instance of this class yourself -
-    you should let :func:`flaskext.sijax.init_sijax` do that for you.
     """
 
-    def __init__(self, app):
-        self._app = app
+    def __init__(self, app=None):
+        self._request_uri = None
 
+        #: Reference to the underlying :class:`sijax.Sijax` object
+        self._sijax = None
+
+        #: The URI to json2.js (JSON support for browsers without native one)
+        self._json_uri = None
+
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
         app.before_request(self._on_before_request)
 
         static_path = app.config.get('SIJAX_STATIC_PATH', None)
@@ -30,24 +33,9 @@ class SijaxHelper(object):
             sijax.helper.init_static_path(static_path)
 
         self._json_uri = app.config.get('SIJAX_JSON_URI', None)
-        self._request_uri = None
-
-        #: Reference to the underlying Sijax object
-        self._sijax = None
 
         app.extensions = getattr(app, 'extensions', {})
         app.extensions['sijax'] = self
-
-    def set_request_uri(self, uri):
-        """Changes the request URI from the automatically detected one.
-
-        The automatically detected URI is the relative URI of the
-        current request, as detected by Flask/Werkzeug.
-
-        You can override the detected URI with another one
-        (for the current request only), by using this function.
-        """
-        self._sijax.set_request_uri(uri)
 
     def _on_before_request(self):
         g.sijax = self
@@ -60,6 +48,17 @@ class SijaxHelper(object):
 
         if self._json_uri is not None:
             self._sijax.set_json_uri(self._json_uri)
+
+    def set_request_uri(self, uri):
+        """Changes the request URI from the automatically detected one.
+
+        The automatically detected URI is the relative URI of the
+        current request, as detected by Flask/Werkzeug.
+
+        You can override the detected URI with another one
+        (for the current request only), by using this function.
+        """
+        self._sijax.set_request_uri(uri)
 
     def register_callback(self, *args, **kwargs):
         """Registers a single callback function.
@@ -173,33 +172,9 @@ class SijaxHelper(object):
         return self._sijax.get_js()
 
 
-def _make_response(response):
-    """Takes a Sijax response object and returns a
-    valid Flask response object."""
-
-    from types import GeneratorType
-
-    if isinstance(response, GeneratorType):
-        # Streaming response using a generator (non-JSON)
-        return Response(response, direct_passthrough=True)
-
-    # Non-streaming response - a single JSON string
-    return response
-
-
-def init_sijax(app):
-    """Initializes the Flask-Sijax extension for the given application.
-
-    :param app: the Flask application object
-    :return: a reference to the helper object -
-             an instance of :class:`flaskext.sijax.SijaxHelper`
-    """
-    return SijaxHelper(app)
-
-
-def route(app_or_module_obj, rule, **options):
-    """An alternative to ``@app.route()`` or ``@mod.route()`` that
-    always adds the ``POST`` method to the allowed methods for a handler.
+def route(app_or_blueprint, rule, **options):
+    """An alternative to :meth:`flask.Flask.route` or :meth:`flask.Blueprint.route` that
+    always adds the ``POST`` method to the allowed endpoint request methods.
 
     You should use this for all your view functions that would need to use Sijax.
 
@@ -207,10 +182,16 @@ def route(app_or_module_obj, rule, **options):
     which means that every endpoint that wants Sijax support
     would have to accept ``POST`` requests.
 
-    If you remember to register your view functions with ``methods=['POST']``
+    Registering functions that would use Sijax should happen like this::
+
+        @flask_sijax.route(app, '/')
+        def index():
+            pass
+
+    If you remember to make your view functions accessible via POST
     like this, you can avoid using this decorator::
 
-        @app.route('/', methods=['POST'])
+        @app.route('/', methods=['GET', 'POST'])
         def index():
             pass
     """
@@ -219,9 +200,19 @@ def route(app_or_module_obj, rule, **options):
         if 'POST' not in methods:
             methods = tuple(methods) + ('POST',)
         options['methods'] = methods
-
-        app_or_module_obj.add_url_rule(rule, None, f, **options)
+        app_or_blueprint.add_url_rule(rule, None, f, **options)
         return f
-
     return decorator
 
+
+def _make_response(response):
+    """Takes a Sijax response object and returns a
+    valid Flask response object."""
+    from types import GeneratorType
+
+    if isinstance(response, GeneratorType):
+        # Streaming response using a generator (non-JSON)
+        return Response(response, direct_passthrough=True)
+
+    # Non-streaming response - a single JSON string
+    return response

@@ -22,7 +22,7 @@ from setuptools import setup
 
 setup(
     name = "Flask-Sijax",
-    version = '0.2.1',
+    version = '0.3.0',
     description = "An extension for the Flask microframework that adds Sijax support.",
     long_description = __doc__,
     author = "Slavi Pantaleev",
@@ -31,8 +31,7 @@ setup(
     keywords = ["ajax", "jQuery", "flask"],
     platforms = "any",
     license = "BSD",
-    packages = ['flaskext'],
-    namespace_packages=['flaskext'],
+    packages = ['flask_sijax'],
     install_requires = ['Flask>=0.7.0', 'Sijax>=0.2.0'],
     test_suite = 'tests',
     zip_safe = False,

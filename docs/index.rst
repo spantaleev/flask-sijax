@@ -41,14 +41,14 @@ Here's an example of how Flask-Sijax is typically initialized and configured::
 
     import os
     from flask import Flask
-    from flaskext.sijax import init_sijax, route
+    import flask_sijax
 
     path = os.path.join('.', os.path.dirname(__file__), 'static/js/sijax/')
 
     app = Flask(__name__)
     app.config['SIJAX_STATIC_PATH'] = path
     app.config['SIJAX_JSON_URI'] = '/static/js/sijax/json2.js'
-    init_sijax(app)
+    flask_sijax.Sijax(app)
 
 
 Configuration options
@@ -66,7 +66,7 @@ The specified directory needs to be dedicated for Sijax static files. You should
 * **SIJAX_JSON_URI** - the URI to load the ``json2.js`` static file from (in case it's needed).
 
 Sijax uses JSON to pass data between the browser and server. This means that browsers either need to support
-JSON natively, or get JSON support from the ``json2.js`` file. Such browsers include IE <= 7.
+JSON natively or get JSON support from the ``json2.js`` file. Such browsers include IE <= 7.
 If you've set a URI to ``json2.js`` and Sijax detects that the browser needs to load it, it will do so on demand.
 The URI could be relative or absolute.
 
@@ -74,26 +74,24 @@ The URI could be relative or absolute.
 Making your Flask functions Sijax-aware
 ----------------------------------------------
 
-To make a function support Sijax requests, you need to create the route to it in a special way.
-If you're not new to Flask you're aware of the ``@app.route`` or ``@mod.route`` decorators that register your function with Flask.
+Registering view functions with Flask is usually done using ``@app.route`` or ``@blueprint.route``.
+Functions registered that way cannot provide Sijax functionality, because they cannot be accessed
+using a POST method by default (and Sijax uses POST requests).
 
-You need to use ``@flaskext.sijax.route`` instead of ``@app.route`` or ``@mod.route`` if you intend to use Sijax
-within a given Flask endpoint function.
-
-Here's how you do it::
+To make a view function capable of handling Sijax requests,
+make it accessible via POST using ``@app.route('/url', methods=['GET', 'POST'])``
+or use the ``@flask_sijax.route`` helper decorator like this::
 
     # Initialization code for Flask and Flask-Sijax
     # See above..
 
-    # The function below CANNOT use Sijax,
-    # because it uses the standard @app.route decorator
+    # Functions registered with @app.route CANNOT use Sijax
     @app.route('/')
     def index():
         return 'Index'
 
-    # The function below can use Sijax,
-    # because it uses the special @flaskext.sijax.route decorator
-    @flaskext.sijax.route(app, '/hello')
+    # Functions registered with @flask_sijax.route can use Sijax
+    @flask_sijax.route(app, '/hello')
     def hello():
         # Every Sijax handler function (like this one) receives at least
         # one parameter automatically, much like Python passes `self`
@@ -128,27 +126,27 @@ Let's assume ``_render_template()`` renders the following page::
     </body>
     </html>
 
-Clicking on the link now fires a Sijax request (a special ``jQuery.ajax()`` request) to the server.
+Clicking on the link will fire a Sijax request (a special ``jQuery.ajax()`` request) to the server.
 
 This request is detected on the server by ``g.sijax.is_sijax_request()``, in which case you let Sijax handle the request.
 
-All functions registered using ``g.sijax.register_callback()`` (see :meth:`flaskext.sijax.SijaxHelper.register_callback`) are exposed for calling from the browser.
+All functions registered using ``g.sijax.register_callback()`` (see :meth:`flask_sijax.Sijax.register_callback`) are exposed for calling from the browser.
 
-Calling ``g.sijax.process_request()`` tells Sijax to call the appropriate function (previously registered) and return the response to the browser.
+Calling ``g.sijax.process_request()`` tells Sijax to execute the appropriate (previously registered) function and return the response to the browser.
 
 To learn more on ``obj_response`` and what it provides, see :class:`sijax.response.BaseResponse`.
-    
+
 
 Setting up the client (browser)
 -------------------------------
 
 The browser needs to talk to the server and that's done using `jQuery`_ (``jQuery.ajax``) and the Sijax javascript files.
-This means that you'll want to load those on each page that needs to use Sijax.
+This means that you'll have to load those on each page that needs to use Sijax.
 
 After both files are loaded, you can put the javascript init code (``g.sijax.get_js()``) somewhere on the page.
 That code is page-specific and needs to be executed, after the ``sijax.js`` file has loaded.
 
-Assuming you've used the above configuration here's what HTML markup you need to add to your template::
+Assuming you've used the above configuration here's the HTML markup you need to add to your template::
 
     <script type="text/javascript"
         src="{ URI to jQuery - not included with this project}"></script>
@@ -219,8 +217,7 @@ The `documentation for Sijax <http://packages.python.org/Sijax/>`_ is very exhau
 API
 ---
 
-.. autofunction:: flaskext.sijax.init_sijax
-.. autofunction:: flaskext.sijax.route
-.. autoclass:: flaskext.sijax.SijaxHelper
+.. autofunction:: flask_sijax.route
+.. autoclass:: flask_sijax.Sijax
    :members:
 
