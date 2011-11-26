@@ -33,7 +33,7 @@ setup(
     license = "BSD",
     packages = ['flaskext'],
     namespace_packages=['flaskext'],
-    install_requires = ['Flask', 'Sijax>=0.2.0'],
+    install_requires = ['Flask>=0.7.0', 'Sijax>=0.2.0'],
     test_suite = 'tests',
     zip_safe = False,
     classifiers = [

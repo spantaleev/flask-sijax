@@ -20,7 +20,7 @@ def _assert_response_json(context, string):
             context.assertTrue('type' in item)
 
 class SijaxFlaskTestCase(unittest.TestCase):
-    
+
     def test_route_always_adds_post_method(self):
         class FlaskMock(object):
             def __init__(self):
@@ -55,11 +55,14 @@ class SijaxFlaskTestCase(unittest.TestCase):
             app.preprocess_request()
             self.assertEqual(id(helper), id(flask.g.sijax))
 
+        # Make sure that access fails when outside of a request context
         try:
             flask.g.sijax
-            self.fail('Bound to g in a non-request context!')
-        except AttributeError:
+        except RuntimeError:
+            # RuntimeError('working outside of request context')
             pass
+        else:
+            self.fail('Bound to g in a non-request context!')
 
     def test_json_uri_config_is_used(self):
         uri = '/some/json_uri.here'
@@ -84,7 +87,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
         with app.test_request_context():
             app.preprocess_request()
-        
+
             js = helper.get_js()
             self.assertTrue('Sijax.setRequestUri("/");' in js)
 
@@ -131,7 +134,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             except AttributeError:
                 # helper._sijax (and flask.g.sijax)
                 pass
-            
+
     def test_register_callback_works(self):
         call_history = []
 
@@ -139,7 +142,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             call_history.append('callback')
             obj_response.alert('test')
 
-        
+
         app = flask.Flask(__name__)
         helper = init_sijax(app)
 
@@ -180,7 +183,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
             helper.register_upload_callback('form_id', callback)
             func_name = sijax.plugin.upload.func_name_by_form_id('form_id')
-            
+
             cls_sijax = helper._sijax.__class__
 
             post = {cls_sijax.PARAM_REQUEST: func_name, cls_sijax.PARAM_ARGS: '["form_id"]', 'post_key': 'val'}
@@ -204,7 +207,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             app.preprocess_request()
 
             self.assertEqual(id(helper._sijax.get_data()), id(flask.request.form))
-        
+
     def test_process_request_returns_a_string_or_a_flask_response_object(self):
         # SijaxHelper.process_request should return a string for regular functions
         # and a Flask.Response object for functions that use a generator (streaming functions)
@@ -212,10 +215,10 @@ class SijaxFlaskTestCase(unittest.TestCase):
 
         app = flask.Flask(__name__)
         helper = init_sijax(app)
-        
+
         with app.test_request_context():
             app.preprocess_request()
-        
+
             cls_sijax = helper._sijax.__class__
 
             post = {cls_sijax.PARAM_REQUEST: 'callback', cls_sijax.PARAM_ARGS: '[]'}
