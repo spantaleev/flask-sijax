@@ -31,7 +31,7 @@ setup(
     keywords = ["ajax", "jQuery", "flask"],
     platforms = "any",
     license = "BSD",
-    packages = ['flask_sijax'],
+    py_modules = ['flask_sijax'],
     install_requires = ['Flask>=0.7.0', 'Sijax>=0.2.0'],
     test_suite = 'tests',
     zip_safe = False,
