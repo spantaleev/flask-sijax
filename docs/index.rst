@@ -57,13 +57,15 @@ Configuration options
 **Flask-Sijax** is configured via the standard Flask config API.
 Here are the available configuration options:
 
-* **SIJAX_STATIC_PATH** - set this to the static path where you want the Sijax files to be located.
+* **SIJAX_STATIC_PATH** - the static path where you want the Sijax javascript files to be mirrored.
 
-Flask-Sijax takes care of keeping the Sijax files up to date in this directory (even between version changes).
-The specified directory needs to be dedicated for Sijax static files. You should not put anything else in it.
+Flask-Sijax takes care of keeping the Sijax javascript files ``sijax.js`` and ``json2.js``
+up to date in this directory (even between version changes).
+
+Don't put anything else in that directory - it should be dedicated to Sijax for hosting the files.
 
 
-* **SIJAX_JSON_URI** - the URI to load the ``json2.js`` static file from (in case it's needed).
+* **SIJAX_JSON_URI** - the URI to load the ``json2.js`` static file from (if needed).
 
 Sijax uses JSON to pass data between the browser and server. This means that browsers either need to support
 JSON natively or get JSON support from the ``json2.js`` file. Such browsers include IE <= 7.
@@ -140,11 +142,16 @@ To learn more on ``obj_response`` and what it provides, see :class:`sijax.respon
 Setting up the client (browser)
 -------------------------------
 
-The browser needs to talk to the server and that's done using `jQuery`_ (``jQuery.ajax``) and the Sijax javascript files.
-This means that you'll have to load those on each page that needs to use Sijax.
+The browser needs to talk to the server and that's done using `jQuery`_ (``jQuery.ajax``)
+and the Sijax javascript file (``sijax.js``).
+You'll have to load those on each page that needs to use Sijax.
 
-After both files are loaded, you can put the javascript init code (``g.sijax.get_js()``) somewhere on the page.
-That code is page-specific and needs to be executed, after the ``sijax.js`` file has loaded.
+The ``sijax.js`` file is part of the `Sijax`_ project, but can be mirrored to a directory
+of your choosing if you use the ``SIJAX_STATIC_PATH`` configuration option (see above).
+There is no need to download Sijax separately and extract the file from it manually.
+
+Once both files are loaded, you can put the javascript init code (``g.sijax.get_js()``) somewhere on the page.
+That code is page-specific and needs to be executed after the ``sijax.js`` file has loaded.
 
 Assuming you've used the above configuration here's the HTML markup you need to add to your template::
 
@@ -160,7 +167,7 @@ You can then invoke a Sijax function using javascript like this::
 
     Sijax.request('function_name', ['argument 1', 150, 'argument 3']);
 
-provided it has been defined and registered with Sijax::
+provided the function has been defined and registered with Sijax on the server-side::
 
     def function_name(obj_response, arg1, arg2, arg3):
         obj_response.alert('You called the function successfully!')
