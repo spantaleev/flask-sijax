@@ -40,7 +40,7 @@ Setting it up
 Here's an example of how Flask-Sijax is typically initialized and configured::
 
     import os
-    from flask import Flask
+    from flask import Flask, g
     import flask_sijax
 
     path = os.path.join('.', os.path.dirname(__file__), 'static/js/sijax/')
@@ -105,7 +105,7 @@ or use the ``@flask_sijax.route`` helper decorator like this::
 
         if g.sijax.is_sijax_request:
             # Sijax request detected - let Sijax handle it
-            g.register_callback('say_hi', say_hi)
+            g.sijax.register_callback('say_hi', say_hi)
             return g.sijax.process_request()
 
         # Regular (non-Sijax request) - render the page template
@@ -124,7 +124,7 @@ Let's assume ``_render_template()`` renders the following page::
     </script>
     </head>
     <body>
-        <a href="javascript://" onclick="Sijax.request('say_hi');"></a>
+        <a href="javascript://" onclick="Sijax.request('say_hi');">Click here</a>
     </body>
     </html>
 
