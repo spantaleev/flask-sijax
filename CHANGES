@@ -1,6 +1,14 @@
 Flask-Sijax Changelog
 =====================
 
+Version 0.3.3
+-------------
+
+Fixes a problem with request.files being inaccessible
+from upload callbacks when running under Werkzeug 0.9+
+("ValueError: I/O operation on closed file").
+
+
 Version 0.3.0
 -------------
 
