@@ -7,18 +7,6 @@ import flask
 import flask_sijax
 
 
-def _assert_response_json(context, string):
-    from sijax.helper import json
-    try:
-        obj = json.loads(string)
-    except:
-        context.fail('Cannot decode JSON!')
-    else:
-        context.assertTrue(isinstance(obj, list))
-        for item in obj:
-            context.assertTrue(isinstance(item, dict))
-            context.assertTrue('type' in item)
-
 class SijaxFlaskTestCase(unittest.TestCase):
 
     def test_route_always_adds_post_method(self):
@@ -142,6 +130,8 @@ class SijaxFlaskTestCase(unittest.TestCase):
                 pass
 
     def test_register_callback_works(self):
+        from sijax.helper import json
+
         call_history = []
 
         def callback(obj_response):
@@ -166,7 +156,11 @@ class SijaxFlaskTestCase(unittest.TestCase):
             self.assertTrue(helper.is_sijax_request)
             response = helper.process_request()
             self.assertEqual(['callback'], call_history)
-            _assert_response_json(self, response)
+
+            try:
+                obj = json.loads(response.get_data(True))
+            except:
+                self.fail('Cannot decode JSON!')
 
     def test_upload_callbacks_receive_the_expected_arguments(self):
         # Upload callbacks should have the following signature:
@@ -212,7 +206,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             app.preprocess_request()
             self.assertEqual(id(helper._sijax.get_data()), id(flask.request.form))
 
-    def test_process_request_returns_a_string_or_a_flask_response_object(self):
+    def test_process_request_returns_a_flask_response_object(self):
         # flask_sijax.Sijax.process_request should return a string for regular functions
         # and a Flask.Response object for functions that use a generator (streaming functions)
         from sijax.response import StreamingIframeResponse
@@ -229,7 +223,7 @@ class SijaxFlaskTestCase(unittest.TestCase):
             helper._sijax.set_data(post)
             helper.register_callback('callback', lambda r: r)
             response = helper.process_request()
-            self.assertTrue(isinstance(response, type('string')))
+            self.assertTrue(isinstance(response, flask.Response))
 
             helper.register_callback('callback', lambda r: r, response_class=StreamingIframeResponse)
             response = helper.process_request()

@@ -8,3 +8,5 @@ dist
 *.swp
 examples/static
 docs/_build
+/.eggs
+/build
