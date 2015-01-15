@@ -22,7 +22,7 @@ from setuptools import setup
 
 setup(
     name = "Flask-Sijax",
-    version = '0.3.3',
+    version = '0.4.0',
     description = "An extension for the Flask microframework that adds Sijax support.",
     long_description = __doc__,
     author = "Slavi Pantaleev",
