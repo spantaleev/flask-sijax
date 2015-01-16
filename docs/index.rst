@@ -178,6 +178,99 @@ To learn more on ``Sijax.request()`` see :ref:`Sijax:clientside-sijax-request`.
 
 Learn more on how it all fits together from the **Examples**.
 
+CSRF protection
+---------------
+
+Learn more about `cross-site request forgery <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_. In a nutshull, you want to ensure that you are indeed communicating with the same trusted user and not an imposter.
+
+In the following, we will see how to implement basic CSRF protection for your
+Sijax calls. The basic idea is that you send out a unique token when
+communitcating with your unique, trusted user and expect the same token when that user communicates with your server.
+
+There are a number of packages out there that can help you with token
+generation and validation. You might be using some of them already so it would
+be easy for you to implement this code.
+
+* Flask-SeaSurf_
+* Flask-WTF_
+* Flask-Security_
+* even Django_
+
+.. _Flask-SeaSurf: https://flask-seasurf.readthedocs.org/en/latest/
+.. _Flask-WTF: https://flask-wtf.readthedocs.org/en/latest/csrf.html
+.. _Flask-Security: https://pythonhosted.org/Flask-Security/index.html
+.. _Django: https://docs.djangoproject.com/en/1.7/ref/contrib/csrf/
+
+In the following, we rely on some adapted code from a `Flask Snippet <http://flask.pocoo.org/snippets/3/>`_ and
+`this gist <https://gist.github.com/danielrichman/5881046>`_. We do this as an
+example here in order to not add more dependencies but it's probably better to
+rely on the above packages to keep up with the development.
+
+The first step is to generate a unique token. The following function illustrates
+a simple way of doing this. Keep in mind that in order to use the session, the
+Flask application needs to have its secret key set.::
+
+    import os
+    import hmac
+    from hashlib import sha1
+    from flask import session
+
+    @app.template_global('csrf_token')
+    def csrf_token():
+        """
+        Generate a token string from bytes arrays. The token in the session is user
+        specific.
+        """
+        if "_csrf_token" not in session:
+            session["_csrf_token"] = os.urandom(128)
+        return hmac.new(app.secret_key, session["_csrf_token"],
+                digestmod=sha1).hexdigest()
+
+
+
+Due to the decorator you can now use this function in any of your templates.
+There are at least four ways to embed the token in your page. Say you have a
+Jinja2 template, then you either put it in a meta tag,::
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+as part of a form into a hidden field,::
+
+    <input type="hidden" name="csrf-token" value="{{ csrf_token() }}">
+
+directly store it in a Javascript variable::
+
+    <script type="text/javascript">
+        var csrfToken = "{{ csrf_token() }}"
+    </script>
+
+or directly as part of your Sijax call::
+
+    <a href="javascript://" onclick="Sijax.request('say_hello', ['John', 'Greg'], { data: { csrf_token: '{{ csrf_token() }}' } }">
+
+In the first two cases, you will have to use Javascript to extract the token
+from the HTML element.
+
+Sijax merges any object of the `data` field of the third argument to
+`Sijax.request` with the form data of the request. We can retrieve the token
+from there and check its consistency. You can automatically do this for any
+request to a view function using the following piece of code::
+
+    @app.before_request
+    def check_csrf_token():
+        """Checks that token is correct, aborting if not"""
+        if request.method in ("GET",): # not exhaustive list
+            return
+        token = request.form.get("csrf_token")
+        if token is None:
+            app.logger.warning("Expected CSRF Token: not present")
+            abort(400)
+        if not safe_str_cmp(token, csrf_token()):
+            app.logger.warning("CSRF Token incorrect")
+            abort(400)
+
+This will check for the presence of a token for any request that is not `GET`
+and compare the delivered with the known token.
 
 Examples
 --------

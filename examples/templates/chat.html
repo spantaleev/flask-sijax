@@ -1,5 +1,7 @@
+<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
     <script type="text/javascript"
         src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
     <script type="text/javascript" src="/static/js/sijax/sijax.js"></script>
@@ -10,19 +12,18 @@
 
 <body>
     <div id="messages" style="border: 1px solid #e0e0e0; margin-bottom: 20px; height: 100px; padding: 5px; overflow-y: scroll;"></div>
-        
+
     <form id="messageForm" name="messageForm">
-        Message: <input type="text" id="message" style="width: 400px" />
-    
-        <input type="submit" value="Send" />
+        Message: <input type="text" id="message" style="width: 400px">
+        <input type="submit" value="Send">
         <button id="btnClear">Clear messages</button>
     </form>
-    
+
     <script type="text/javascript">
-    $(function() {          
+    $(function() {
         $('#messageForm').bind('submit', function() {
-            Sijax.request('save_message', [$('#message').attr('value')]);
-            
+            Sijax.request('save_message', [$('#message').attr('value')],
+                { data: { csrf_token: "{{ csrf_token() }}" } });
             //Prevent the form from being submitted
             return false;
         });
@@ -30,7 +31,7 @@
         $('#message').focus();
 
         $('#btnClear').bind('click', function() {
-            Sijax.request('clear_messages');
+            Sijax.request('clear_messages', [], { data: { csrf_token: "{{ csrf_token() }}" } });
 
             return false;
         });
