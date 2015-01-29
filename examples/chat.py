@@ -2,15 +2,40 @@
 
 """A chat/shoutbox using Sijax."""
 
-import os, sys
+import os
+import hmac
+from hashlib import sha1
 
-path = os.path.join('.', os.path.dirname(__file__), '../')
-sys.path.append(path)
-
-from flask import Flask, g, render_template
+from flask import Flask, g, render_template, session, abort, request
+from werkzeug.security import safe_str_cmp
 import flask_sijax
 
 app = Flask(__name__)
+app.secret_key = os.urandom(128)
+
+@app.template_global('csrf_token')
+def csrf_token():
+    """
+    Generate a token string from bytes arrays. The token in the session is user
+    specific.
+    """
+    if "_csrf_token" not in session:
+        session["_csrf_token"] = os.urandom(128)
+    return hmac.new(app.secret_key, session["_csrf_token"],
+            digestmod=sha1).hexdigest()
+
+@app.before_request
+def check_csrf_token():
+    """Checks that token is correct, aborting if not"""
+    if request.method in ("GET",): # not exhaustive list
+        return
+    token = request.form.get("csrf_token")
+    if token is None:
+        app.logger.warning("Expected CSRF Token: not present")
+        abort(400)
+    if not safe_str_cmp(token, csrf_token()):
+        app.logger.warning("CSRF Token incorrect")
+        abort(400)
 
 # The path where you want the extension to create the needed javascript files
 # DON'T put any of your files in this directory, because they'll be deleted!
@@ -32,6 +57,7 @@ class SijaxHandler(object):
 
     @staticmethod
     def save_message(obj_response, message):
+
         message = message.strip()
         if message == '':
             return obj_response.alert("Empty messages are not allowed!")
@@ -40,7 +66,7 @@ class SijaxHandler(object):
 
         import time, hashlib
         time_txt = time.strftime("%H:%M:%S", time.gmtime(time.time()))
-        message_id = 'message_%s' % hashlib.sha256(time_txt).hexdigest()
+        message_id = 'message_%s' % hashlib.sha256(time_txt.encode("utf-8")).hexdigest()
 
         message = """
         <div id="%s" style="opacity: 0;">
@@ -61,8 +87,10 @@ class SijaxHandler(object):
         # Make the new message appear in 400ms
         obj_response.script("$('#%s').animate({opacity: 1}, 400);" % message_id)
 
+
     @staticmethod
     def clear_messages(obj_response):
+
         # Delete all messages from the database
 
         # Clear the messages container
@@ -87,3 +115,4 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True, port=8080)
+
