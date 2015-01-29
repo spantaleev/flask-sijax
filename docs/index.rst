@@ -181,7 +181,7 @@ Learn more on how it all fits together from the **Examples**.
 CSRF protection
 ---------------
 
-Learn more about `cross-site request forgery <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_. In a nutshull, you want to ensure that you are indeed communicating with the same trusted user and not an imposter.
+Learn more about `cross-site request forgery <http://en.wikipedia.org/wiki/Cross-site_request_forgery>`_. In a nutshell, you want to ensure that you are indeed communicating with the same trusted user and not an imposter.
 
 In the following, we will see how to implement basic CSRF protection for your
 Sijax calls. The basic idea is that you send out a unique token when
